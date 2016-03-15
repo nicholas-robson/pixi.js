@@ -173,4 +173,34 @@ Camera3d.prototype.updateTransform3d = function() {
     }
 };
 
+core.DisplayObject.prototype._sortValue = 0;
+
+var tempArr1 = [];
+var tempArr2 = [];
+function sortFuncValue(a, b) {
+    return a._sortValue - b._sortValue;
+}
+
+Camera3d.prototype.sortChildren = function(elem, valFunc) {
+    var c = elem.children;
+    tempArr1.length = 0;
+    tempArr2.length = 0;
+    var n = c.length;
+    var i;
+    for (i=0; i<n;i++) {
+        if (c[i].renderable) {
+            c[i]._sortValue = valFunc(c[i]);
+            tempArr1.push(c[i]);
+        } else {
+            tempArr2.push(c[i]);
+        }
+    }
+    tempArr1.sort(sortFuncValue);
+    var n1 = tempArr1.length, n2 = n-n1;
+    for (i=0; i<n1;i++)
+        c[i] = tempArr1[i];
+    for (i=0; i<n2;i++)
+        c[i+n1] = tempArr2[i];
+};
+
 module.exports = Camera3d;

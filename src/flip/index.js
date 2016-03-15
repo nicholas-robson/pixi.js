@@ -50,10 +50,16 @@ core.Container.prototype.displayObjectUpdateTransform3d = function()
         var ry = this.euler.y;
         var rz = this.euler.z;
 
-        temp3dTransform[0] = this.position.x;
-        temp3dTransform[1] = this.position.y;
-        temp3dTransform[2] = this.position.z;
-        if (rx !== 0 || ry !== 0 || rz !== 0 || true) {
+        var px = this.position.x;
+        var py = this.position.y;
+        var pz = this.position.z;
+
+        var flag = px || py || pz;
+        temp3dTransform[0] = px;
+        temp3dTransform[1] = py;
+        temp3dTransform[2] = pz;
+        if (rx !== 0 || ry !== 0 || rz !== 0) {
+            flag = true;
             //TODO cach sin cos?
             var c1 = Math.cos(rx / 2);
             var c2 = Math.cos(ry / 2);
@@ -75,6 +81,7 @@ core.Container.prototype.displayObjectUpdateTransform3d = function()
 
         rx = this.scale.x; ry = this.scale.y; rz = this.scale.z;
         if (rx !== 1 || ry !== 1 || rz !== 1) {
+            flag = true;
             temp3dTransform[0] = rx;
             temp3dTransform[1] = ry;
             temp3dTransform[2] = rz;
@@ -84,12 +91,17 @@ core.Container.prototype.displayObjectUpdateTransform3d = function()
         rx = this.pivot.x; ry = this.pivot.y; rz = this.pivot.z;
 
         if (rx || ry || rz) {
+            flag = true;
             temp3dTransform[0] = -this.pivot.x;
             temp3dTransform[1] = -this.pivot.y;
             temp3dTransform[2] = -this.pivot.z;
             glMat.mat4.translate(localTransform, localTransform, temp3dTransform)
         }
-        glMat.mat4.multiply(this.worldTransform3d, this.parent.worldTransform3d, localTransform);
+        if (flag) {
+            glMat.mat4.multiply(this.worldTransform3d, this.parent.worldTransform3d, localTransform);
+        } else {
+            glMat.mat4.copy(this.worldTransform3d, this.parent.worldTransform3d);
+        }
     }
     else
     {
@@ -302,7 +314,7 @@ core.Sprite.prototype.containsPoint = function( point, renderer)
 {
     if(this.worldTransform3d)
     {
-        return this.containsPoint3d(point, renderer);
+        return this.containsPoint3d(point, this.worldProjectionMatrix);
     }
     else
     {

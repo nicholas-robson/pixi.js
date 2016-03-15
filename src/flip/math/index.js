@@ -67,7 +67,9 @@ module.exports = {
     getRayFromScreen: function (point, projectionMatrix) {
         var tempP = vec3.create();
 
-        if (!projectionMatrix)return [[0, 0, 0], [0, 0, 0]];
+        if (!projectionMatrix) {
+            return [[point.x, point.y, -1], [0, 0, 1]];
+        }
         var inverse = mat4.invert(mat4.create(), projectionMatrix);
 
         // get the near plane..
