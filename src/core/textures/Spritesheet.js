@@ -188,7 +188,9 @@ export default class Spritesheet
                 }
 
                 //  Check to see if the sprite is trimmed
-                if (this._frames[i].trimmed)
+                if (this._frames[i].trimmed
+                    || this._frames[i].sourceSize.w > rect.w
+                    || this._frames[i].sourceSize.h > rect.h)
                 {
                     trim = new Rectangle(
                         this._frames[i].spriteSourceSize.x / this.resolution,
